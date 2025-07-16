@@ -38,7 +38,7 @@ h1 {
   margin: 6px 0;
   padding: 10px;
   border-radius: 5px;
-  background-color: #ffc0cb; /* rosado */
+  background-color: #ffc0cb;
   border: 1px solid #aaa;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -49,13 +49,13 @@ h1 {
 }
 
 .ramo.aprobado {
-  background-color: #6a0dad; /* morado */
+  background-color: #6a0dad;
   color: white;
   text-decoration: line-through;
 }
 
 .ramo.bloqueado {
-  background-color: #d3d3d3; /* gris */
+  background-color: #d3d3d3;
   color: #777;
   cursor: not-allowed;
   text-decoration: none;
