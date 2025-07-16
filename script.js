@@ -1,3 +1,4 @@
+// Lista de ramos por semestre
 const malla = [
   // 1º Semestre
   [
@@ -18,25 +19,28 @@ const malla = [
   ]
 ];
 
-// Estado local (en memoria)
-const estado = JSON.parse(localStorage.getItem("estadoRamos")) || {};
+// Cargar estado guardado desde localStorage
+const estado = JSON.parse(localStorage.getItem("estadoRamos") || "{}");
 
+// Verifica si se puede aprobar un ramo (según prerrequisitos)
 function puedeAprobar(ramo) {
-  return (ramo.prerrequisitos || []).every(pr => estado[pr] === true);
+  return (ramo.prerrequisitos || []).every(pr => estado[pr]);
 }
 
+// Guarda el estado en localStorage
 function guardarEstado() {
   localStorage.setItem("estadoRamos", JSON.stringify(estado));
 }
 
+// Renderiza la malla completa
 function renderMalla() {
   const contenedor = document.getElementById("malla");
   contenedor.innerHTML = "";
 
-  malla.forEach((semestre, i) => {
+  malla.forEach((semestre, index) => {
     const semestreDiv = document.createElement("div");
     semestreDiv.className = "semestre";
-    semestreDiv.innerHTML = `<h2>Semestre ${i + 1}</h2>`;
+    semestreDiv.innerHTML = `<h2>Semestre ${index + 1}</h2>`;
 
     semestre.forEach(ramo => {
       const div = document.createElement("div");
@@ -54,7 +58,7 @@ function renderMalla() {
 
       div.onclick = () => {
         if (!habilitado) return;
-        estado[ramo.id] = !estado[ramo.id];
+        estado[ramo.id] = !aprobado;
         guardarEstado();
         renderMalla();
       };
@@ -66,4 +70,5 @@ function renderMalla() {
   });
 }
 
+// Ejecutar al cargar
 renderMalla();
