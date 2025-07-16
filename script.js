@@ -1,43 +1,69 @@
-body {
-  font-family: sans-serif;
-  padding: 20px;
-  background-color: #f4f4f4;
+const malla = [
+  // 1º Semestre
+  [
+    { id: "base_sociocultural", nombre: "Bases Socioculturales de la Psicología" },
+    { id: "comunicacion", nombre: "Comunicación Académica y Pensamiento Científico" },
+    { id: "historia", nombre: "Introducción Histórica a la Psicología" },
+    { id: "neurobio", nombre: "Neurobiología" }
+  ],
+  // 2º Semestre
+  [
+    { id: "teoria1", nombre: "Teoría Psicológica I", prerrequisitos: ["historia"] },
+    { id: "neurocog", nombre: "Neurociencia Cognitiva y Afectiva", prerrequisitos: ["neurobio"] }
+  ],
+  // 3º Semestre
+  [
+    { id: "teoria2", nombre: "Teoría Psicológica II", prerrequisitos: ["teoria1"] },
+    { id: "psic_social1", nombre: "Psicología Social I" }
+  ]
+];
+
+// Estado local (en memoria)
+const estado = JSON.parse(localStorage.getItem("estadoRamos")) || {};
+
+function puedeAprobar(ramo) {
+  return (ramo.prerrequisitos || []).every(pr => estado[pr] === true);
 }
-h1 {
-  text-align: center;
+
+function guardarEstado() {
+  localStorage.setItem("estadoRamos", JSON.stringify(estado));
 }
-.malla {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 20px;
+
+function renderMalla() {
+  const contenedor = document.getElementById("malla");
+  contenedor.innerHTML = "";
+
+  malla.forEach((semestre, i) => {
+    const semestreDiv = document.createElement("div");
+    semestreDiv.className = "semestre";
+    semestreDiv.innerHTML = `<h2>Semestre ${i + 1}</h2>`;
+
+    semestre.forEach(ramo => {
+      const div = document.createElement("div");
+      div.className = "ramo";
+      div.textContent = ramo.nombre;
+
+      const aprobado = estado[ramo.id] === true;
+      const habilitado = puedeAprobar(ramo);
+
+      if (aprobado) {
+        div.classList.add("aprobado");
+      } else if (!habilitado) {
+        div.classList.add("bloqueado");
+      }
+
+      div.onclick = () => {
+        if (!habilitado) return;
+        estado[ramo.id] = !estado[ramo.id];
+        guardarEstado();
+        renderMalla();
+      };
+
+      semestreDiv.appendChild(div);
+    });
+
+    contenedor.appendChild(semestreDiv);
+  });
 }
-.semestre {
-  background-color: white;
-  padding: 10px;
-  border: 1px solid #ccc;
-  width: 220px;
-}
-.semestre h2 {
-  text-align: center;
-  font-size: 18px;
-  margin-bottom: 10px;
-}
-.ramo {
-  margin: 5px 0;
-  padding: 8px;
-  background-color: pink;
-  border: 1px solid #aaa;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-.ramo.aprobado {
-  background-color: purple;
-  color: white;
-  text-decoration: line-through;
-}
-.ramo.bloqueado {
-  background-color: #ccc;
-  color: #777;
-  cursor: not-allowed;
-}
+
+renderMalla();
