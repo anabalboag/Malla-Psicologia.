@@ -18,7 +18,6 @@ const malla = [
   ]
 ];
 
-// Estado local guardado en el navegador
 const estado = JSON.parse(localStorage.getItem("estadoRamos")) || {};
 
 function puedeAprobar(ramo) {
