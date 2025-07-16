@@ -1,64 +1,67 @@
 """
-body {
-  font-family: Arial, sans-serif;
-  padding: 20px;
-  background-color: #f4f4f4;
-  margin: 0;
+const malla = [
+  [
+    { id: "base_sociocultural", nombre: "Bases Socioculturales de la Psicología" },
+    { id: "comunicacion", nombre: "Comunicación Académica y Pensamiento Científico" },
+    { id: "historia", nombre: "Introducción Histórica a la Psicología" },
+    { id: "neurobio", nombre: "Neurobiología" }
+  ],
+  [
+    { id: "teoria1", nombre: "Teoría Psicológica I", prerrequisitos: ["historia"] },
+    { id: "neurocog", nombre: "Neurociencia Cognitiva y Afectiva", prerrequisitos: ["neurobio"] }
+  ],
+  [
+    { id: "teoria2", nombre: "Teoría Psicológica II", prerrequisitos: ["teoria1"] },
+    { id: "psic_social1", nombre: "Psicología Social I" }
+  ]
+];
+
+const estado = JSON.parse(localStorage.getItem("estadoRamos")) || {};
+
+function puedeAprobar(ramo) {
+  return (ramo.prerrequisitos || []).every(pr => estado[pr] === true);
 }
 
-h1 {
-  text-align: center;
-  color: #333;
+function guardarEstado() {
+  localStorage.setItem("estadoRamos", JSON.stringify(estado));
 }
 
-.malla {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 30px;
+function renderMalla() {
+  const contenedor = document.getElementById("malla");
+  contenedor.innerHTML = "";
+
+  malla.forEach((semestre, i) => {
+    const semestreDiv = document.createElement("div");
+    semestreDiv.className = "semestre";
+    semestreDiv.innerHTML = `<h2>Semestre ${i + 1}</h2>`;
+
+    semestre.forEach(ramo => {
+      const div = document.createElement("div");
+      div.className = "ramo";
+      div.textContent = ramo.nombre;
+
+      const aprobado = estado[ramo.id] === true;
+      const habilitado = puedeAprobar(ramo);
+
+      if (aprobado) {
+        div.classList.add("aprobado");
+      } else if (!habilitado) {
+        div.classList.add("bloqueado");
+      }
+
+      div.onclick = () => {
+        if (!habilitado) return;
+        estado[ramo.id] = !estado[ramo.id];
+        guardarEstado();
+        renderMalla();
+      };
+
+      semestreDiv.appendChild(div);
+    });
+
+    contenedor.appendChild(semestreDiv);
+  });
 }
 
-.semestre {
-  background-color: white;
-  border: 2px solid #ddd;
-  border-radius: 10px;
-  padding: 15px;
-  width: 220px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.semestre h2 {
-  text-align: center;
-  font-size: 18px;
-  margin-bottom: 10px;
-  color: #555;
-}
-
-.ramo {
-  margin: 6px 0;
-  padding: 10px;
-  border-radius: 5px;
-  background-color: #ffc0cb;
-  border: 1px solid #aaa;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.ramo:hover {
-  opacity: 0.9;
-}
-
-.ramo.aprobado {
-  background-color: #6a0dad;
-  color: white;
-  text-decoration: line-through;
-}
-
-.ramo.bloqueado {
-  background-color: #d3d3d3;
-  color: #777;
-  cursor: not-allowed;
-  text-decoration: none;
-}
+renderMalla();
 """
